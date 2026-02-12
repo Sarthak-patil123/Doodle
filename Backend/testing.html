@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Chat</title>
+</head>
+<body>
+  <input id="username" placeholder="username" />
+  <input id="room" placeholder="room" />
+  <button onclick="joinRoom()">Join</button>
+
+  <ul id="messages"></ul>
+
+  <input id="msg" placeholder="message" />
+  <button onclick="sendMsg()">Send</button>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io("http://localhost:3000");
+
+    function joinRoom() {
+      const username = document.getElementById("username").value;
+      const room = document.getElementById("room").value;
+      socket.emit("join_room", { username, room });
+    }
+
+    function sendMsg() {
+      const msg = document.getElementById("msg").value;
+      socket.emit("send_msg", msg);
+    }
+
+    socket.on("chat_msg", (data) => {
+      const li = document.createElement("li");
+      li.innerText = `${data.user}: ${data.text}`;
+      document.getElementById("messages").appendChild(li);
+    });
+
+    socket.on("system_msg", (msg) => {
+      const li = document.createElement("li");
+      li.innerText = `[SYSTEM] ${msg}`;
+      document.getElementById("messages").appendChild(li);
+    });
+  </script>
+</body>
+</html>
